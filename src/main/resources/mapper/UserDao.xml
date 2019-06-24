@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.online.dao.UserDao">
+	<select id="loginUser" resultType="com.example.online.entity.User" >
+		SELECT *
+		FROM user
+		WHERE school_number=#{schoolNumber} and school_password=#{schoolPassword}
+	</select>
+	<insert id="insertUser" useGeneratedKeys="true" >
+		INSERT INTO
+		user(user_name,school_number,school_password)
+		VALUES
+		(#{userName},#{schoolNumber},#{schoolPassword})
+	</insert>
+	<delete id="deleteUser">
+		DELETE FROM
+		user
+		WHERE
+		user_id =
+		#{userId}
+	</delete>
+    <update id="updateUserInfo" parameterType="com.example.online.entity.User"
+            keyProperty="user_id" useGeneratedKeys="true">
+        UPDATE user
+        <set>
+            <if test="userName != null">user_name=#{userName},</if>
+            <if test="userImg != null">user_img=#{userImg},</if>
+            <if test="telephone != null">telephone=#{telephone},</if>
+            <if test="qq != null">qq=#{qq},</if>
+            <if test="introduceMyself != null">introduce_myself=#{introduceMyself},</if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+</mapper>
+    

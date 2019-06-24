@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.online.dao.HistoryDao">
+    <select id="getHistory" resultType="com.example.online.entity.History">
+       select *
+        from history
+        where shop_id=#{shopId} and user_id=#{userId}
+    </select>
+    <select id="getCollected" resultType="com.example.online.entity.History">
+        select *
+        from history
+        where shop_id=#{shopId} and user_id=#{userId} AND if_collected=1
+    </select>
+    <select id="listHistory" resultType="com.example.online.entity.History">
+        select *
+        from history
+        where user_id=#{userId}
+    </select>
+    <select id="listCollectedList" resultType="com.example.online.entity.History">
+        SELECT *
+        from history
+        WHERE user_id=#{userId} AND if_collected=1
+    </select>
+    <insert id="insertHistory" useGeneratedKeys="true" keyProperty="historyId"
+            keyColumn="history_id" >
+        INSERT  INTO history(user_id,shop_id)
+        VALUES (#{userId},#{shopId})
+    </insert>
+
+    <update id="insertCollectedList" parameterType="com.example.online.entity.History">
+        UPDATE history
+        SET if_collected=1
+        WHERE shop_id=#{shopId} AND user_id=#{userId}
+    </update>
+    <delete id="deleteFromHistory">
+        DELETE FROM
+        history
+        WHERE
+        shop_id=#{shopId} and user_id=#{userId}
+    </delete>
+    <delete id="deleteAllHistory">
+        DELETE FROM history WHERE user_id=#{userId}
+    </delete>
+    <update id="deleteFromCollectedList">
+        UPDATE history
+        SET if_collected=0
+        WHERE shop_id=#{shopId} and user_id=#{userId}
+    </update>
+    <update id="deleteAllCollectedList">
+        UPDATE history SET if_collected=0
+        WHERE if_collected=1 AND user_id=#{userId}
+    </update>
+</mapper>

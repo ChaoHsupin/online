@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.online.dao.ShopDao">
+	<resultMap id="shopMap" type="com.example.online.entity.Shop">
+		<id column="shop_id" property="shopId" />
+		<result column="shop_name" property="shopName" />
+		<result column="shop_img" property="shopImg" />
+		<result column="shop_info" property="shopImg" />
+		<result column="if_solved" property="ifSolved" />
+		<result column="seller_id" property="sellerId" />
+		<result column="buyer_id" property="buyerId" />
+
+		<association property="sellerId" column="seller_id"
+			javaType="com.example.online.entity.User">
+			<id column="user_id" property="userId" />
+			<result column="user_name" property="userName" />
+		</association>
+        <association property="buyerId" column="buyer_id"
+                     javaType="com.example.online.entity.User">
+            <id column="user_id" property="userId" />
+            <result column="user_name" property="userName" />
+        </association>
+	</resultMap>
+	<select id="queryShopList" resultType="com.example.online.entity.Shop">
+		SELECT
+		*
+		FROM
+		goods
+		<where>
+			<!-- 写like语句的时候 一般都会写成 like '% %' 在mybatis里面写就是应该是 like '%${name} %' 而不是 
+				'%#{name} %' ${name} 是不带单引号的，而#{name} 是带单引号的 -->
+			   goods.shop_name like '%${shopName}%'
+		</where>
+		ORDER BY
+		shop_id DESC
+	</select>
+    <select id="queryShopCount" resultType="int">
+        SELECT count(*) FROM goods
+        <where>
+            <if test="shopName!=null">
+                and shop_name like '%${shopName}%'
+            </if>
+        </where>
+    </select>
+    <select id="querySaledShopList" resultType="com.example.online.entity.Shop">
+        select * from goods
+        where
+        seller_id=#{sellerId} and if_solved=1
+    </select>
+    <select id="querySellingShopList" resultType="com.example.online.entity.Shop">
+        select * from goods
+        where seller_id=#{sellerId} and if_solved=0
+    </select>
+    <select id="queryBoughtShopList" resultType="com.example.online.entity.Shop">
+        select * from goods
+        where buyer_id=#{buyerId}
+    </select>
+
+	<select id="queryShopById" resultType="com.example.online.entity.Shop">
+		SELECT
+		*
+		FROM
+		goods
+		WHERE shop_id=#{shopId}
+	</select>
+    <select id="randomShopList" resultType="com.example.online.entity.Shop">
+        select * from goods
+        where if_solved=0
+        order by rand() limit 20
+    </select>
+	<insert id="insertShop" parameterType="com.example.online.entity.Shop"
+		useGeneratedKeys="true" keyProperty="shop_id" keyColumn="shop_id">
+		INSERT INTO
+		goods(shop_name,shop_info,if_solved,seller_id,buyer_id)
+		VALUES
+		(#{shopName},#{shopInfo},
+		0,#{sellerId},#{buyerId})
+	</insert>
+    <update id="successSaleShop"
+            keyProperty="shop_id" useGeneratedKeys="true">
+        UPDATE goods
+
+        SET if_solved=1,buyer_id=#{buyerId}
+
+        WHERE shop_id = #{shopId}
+    </update>
+
+	<update id="updateShop" parameterType="com.example.online.entity.Shop"
+		keyProperty="shop_id" useGeneratedKeys="true">
+		UPDATE goods
+		<set>
+			<if test="shopName != null">shop_name=#{shopName},</if>
+			<if test="shopImg != null">shop_img=#{shopImg},</if>
+			<if test="shopInfo != null">shop_info=#{shopInfo},</if>
+			<if test="ifSolved != null">if_solved=#{ifSolved}</if>
+		</set>
+		WHERE shop_id = #{shopId}
+        and seller_id=#{sellerId}
+	</update>
+
+
+	<delete id="deleteShop">
+		DELETE FROM
+		goods
+		WHERE
+		shop_id = #{shopId}
+		AND seller_id=#{sellerId}
+	</delete>
+</mapper>
